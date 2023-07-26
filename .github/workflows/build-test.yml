@@ -22,5 +22,19 @@ jobs:
           node-version: 16
       - name: Install Dependencies
         run: npm install
+      - name: Wait for Services to Start
+        run: |
+          # Wait for 60 seconds with 10 seconds interval for the services to start
+          n=0
+          until [ $n -ge 6 ]; do
+            if curl -sSf http://localhost:8080/health_check; then
+              echo "Services are up and running!"
+              break
+            else
+              echo "Waiting for services to start..."
+              sleep 10
+              n=$((n+1))
+            fi
+          done
       - name: Run test
         run: npm run test
