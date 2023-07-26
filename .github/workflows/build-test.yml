@@ -10,7 +10,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: docker compose
-        run: docker compose up
+        run: docker compose up -d
+      - name: Wait for Services to Start
+        run: |
+          # Wait for the container to be in the "running" state
+          until [ "$(docker inspect -f '{{.State.Status}}' my_container_name)" = "running" ]; do
+            echo "Waiting for services to start..."
+            sleep 5
+          done
   run-tests:
     runs-on: ubuntu-latest
     steps:
@@ -22,19 +29,5 @@ jobs:
           node-version: 16
       - name: Install Dependencies
         run: npm install
-      - name: Wait for Services to Start
-        run: |
-          # Wait for 60 seconds with 10 seconds interval for the services to start
-          n=0
-          until [ $n -ge 6 ]; do
-            if curl -sSf http://localhost:8080/health_check; then
-              echo "Services are up and running!"
-              break
-            else
-              echo "Waiting for services to start..."
-              sleep 10
-              n=$((n+1))
-            fi
-          done
       - name: Run test
         run: npm run test
