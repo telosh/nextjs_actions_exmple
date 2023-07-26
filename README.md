@@ -1,0 +1,2 @@
+# nextjs_actions_exmple
+NextJSのビルドテストをactionsで行いテストにかかる時間をなるべく減らせるようにするための土台
